@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdio.h>
 #include <string.h>
 
@@ -37,4 +39,5 @@
 #define RC522_SPI_BUS_GPIO_SCLK    (18)
 #define RC522_SPI_SCANNER_GPIO_SDA (5)
 #define RC522_SCANNER_GPIO_RST     (-1) // soft-reset, ou 22 para manual
+
 
