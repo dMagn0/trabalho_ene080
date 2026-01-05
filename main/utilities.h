@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sys/param.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -10,6 +11,11 @@
 #include <freertos/stream_buffer.h>
 #include <freertos/message_buffer.h>
 #include <freertos/timers.h>
+
+#include "esp_wifi.h"
+#include "nvs_flash.h"
+#include "esp_netif.h"
+#include "esp_http_server.h"
 
 #include <driver/gpio.h>
 #include <esp_log.h>
@@ -24,6 +30,8 @@
 #include "ssd1306.h"
 #include "driver/i2c.h"
 
+#define SSID "your ssid"
+#define PASS "your pasword"
 
 #define OLED_GPIO_SDA 21
 #define OLED_GPIO_SCL 22
@@ -41,3 +49,13 @@
 #define RC522_SCANNER_GPIO_RST     (-1) // soft-reset, ou 22 para manual
 
 
+
+#define MAX_USERS 64
+typedef struct {
+    char chave[9];
+    char nome[64];
+    float saldo;
+} conta_t;
+
+static char num_contas_cadastradas = 0;
+static conta_t contas_cadastradas[MAX_USERS];

@@ -17,16 +17,11 @@ void display_init(void) {
 	ssd1306_contrast(&dev, 0xff);
 }
 
-void escreve_oled(char linha, char *data_m, size_t msize){
-    // uint16_t data;
-    // char data_m[200];
-    // size_t msize;
-    // while (1)
-    // {
-        // msize = xMessageBufferReceive(buffer_rfid, data_m, sizeof(data_m), portMAX_DELAY);
-        // ESP_LOGI("LEITURA", "%.*s", msize, data_m);
-        ssd1306_clear_screen(&dev, false);
-        ssd1306_display_text(&dev, linha, data_m, msize, false);
-    // }
 
+void escreve_oled(char *linha_0, size_t msize_0, char *linha_3, size_t msize_3){
+
+    ssd1306_clear_screen(&dev, false);
+    ssd1306_display_text(&dev, 0, linha_0, msize_0, false);
+    ssd1306_display_text(&dev, 1, linha_3, msize_3, false);
+    
 }
