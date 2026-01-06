@@ -2,6 +2,7 @@
 #include "my_rfid.h"
 #include "my_oled.h"
 #include "sensores.h"
+#include "servidor_http.h"
 
 
 
@@ -23,11 +24,13 @@
 
 void app_main()
 {
-    display_init();
-    rfid_main();
-    dht11_main();
+    // display_init();
+    // rfid_main();
+    // dht11_main();
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    http_main();
 
-    xTaskCreate(leitura_sensor, "temp_umid", 2048, NULL, 2, NULL);
+    // xTaskCreate(leitura_sensor, "temp_umid", 2048, NULL, 2, NULL);
     // xTaskCreate(display_sens, "display", 2048, NULL, 2, NULL);
 
 }

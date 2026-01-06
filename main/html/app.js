@@ -31,6 +31,7 @@ document.getElementById("formAdd").onsubmit = async e => {
     e.preventDefault();
     
     const formData = new FormData(e.target);
+    const chave = formData.get("chave").toUpperCase();
     
     if (!/^[0-9A-F]{8}$/.test(formData.get("chave"))) {
         alert("Chave inválida. Use exatamente 8 caracteres hexadecimais.");

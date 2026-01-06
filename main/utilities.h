@@ -30,8 +30,10 @@
 #include "ssd1306.h"
 #include "driver/i2c.h"
 
-#define SSID "your ssid"
-#define PASS "your pasword"
+// #define SSID "dmgn"
+// #define PASS "66666666"
+#define SSID "Label Aulas"
+#define PASS ""
 
 #define OLED_GPIO_SDA 21
 #define OLED_GPIO_SCL 22
@@ -57,5 +59,5 @@ typedef struct {
     float saldo;
 } conta_t;
 
-static char num_contas_cadastradas = 0;
+static int num_contas_cadastradas = 0;
 static conta_t contas_cadastradas[MAX_USERS];
