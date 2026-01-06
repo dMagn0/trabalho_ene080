@@ -22,6 +22,7 @@ typedef enum {
 
 int get_num_contas();
 void get_conta_por_indice(int indice);
+Operacao get_conta_por_chave(char* chave, conta_t* conta)
 
 Operacao cadastra_conta(conta_t nova_conta);
 Operacao remove_conta(char* chave);

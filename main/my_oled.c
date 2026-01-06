@@ -1,10 +1,5 @@
 #include "my_oled.h"
 
-/*  troca   */
-#include "my_rfid.h"
-/*          */
-
-
 SSD1306_t dev;
 
 void display_init(void) {
@@ -17,11 +12,10 @@ void display_init(void) {
 	ssd1306_contrast(&dev, 0xff);
 }
 
-
-void escreve_oled(char *linha_0, size_t msize_0, char *linha_3, size_t msize_3){
-
+void apaga_oled(){
     ssd1306_clear_screen(&dev, false);
-    ssd1306_display_text(&dev, 0, linha_0, msize_0, false);
-    ssd1306_display_text(&dev, 1, linha_3, msize_3, false);
-    
+}
+void escreve_oled(char *frase, size_t msize, int linha){
+
+    ssd1306_display_text(&dev, linha, frase, msize, false);    
 }

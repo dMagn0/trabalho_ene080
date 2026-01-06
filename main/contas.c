@@ -8,11 +8,23 @@ static conta_t contas_cadastradas[MAX_USERS];
 int get_num_contas(){
     return num_contas_cadastradas;
 }
+
 Operacao get_conta(char* chave, conta_t** conta){
     for(int i = 0; i<num_contas_cadastradas;i++){
         if(strcmp(contas_cadastradas[i].chave, chave) == 0){
             
             *conta = &contas_cadastradas[i];
+            return OP_SUCESSO; 
+        }
+    }
+    return OP_INVALIDA;
+}
+
+Operacao get_conta_por_chave(char* chave, conta_t* conta){
+    for(int i = 0; i<num_contas_cadastradas;i++){
+        if(strcmp(contas_cadastradas[i].chave, chave) == 0){
+            
+            *conta = contas_cadastradas[i];
             return OP_SUCESSO; 
         }
     }

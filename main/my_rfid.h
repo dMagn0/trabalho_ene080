@@ -2,6 +2,8 @@
 
 #include "utilities.h"
 
+extern MessageBufferHandle_t buffer_rfid;
+
 static const char *TAG = "rc522";
 
 static rc522_spi_config_t driver_config = {
