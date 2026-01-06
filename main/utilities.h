@@ -30,6 +30,8 @@
 #include "ssd1306.h"
 #include "driver/i2c.h"
 
+#include "contas.h"
+
 // #define SSID "dmgn"
 // #define PASS "66666666"
 #define SSID "Label Aulas"
@@ -49,15 +51,3 @@
 #define RC522_SPI_BUS_GPIO_SCLK    (18)
 #define RC522_SPI_SCANNER_GPIO_SDA (5)
 #define RC522_SCANNER_GPIO_RST     (-1) // soft-reset, ou 22 para manual
-
-
-
-#define MAX_USERS 64
-typedef struct {
-    char chave[9];
-    char nome[64];
-    float saldo;
-} conta_t;
-
-static int num_contas_cadastradas = 0;
-static conta_t contas_cadastradas[MAX_USERS];

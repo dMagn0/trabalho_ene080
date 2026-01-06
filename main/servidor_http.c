@@ -47,30 +47,12 @@ static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_b
     {
         ESP_LOGI(TAG, "connect to the AP fail");
     }
-    /*
-    switch (event_id)
-    {
-    case WIFI_EVENT_STA_START:
-        printf("WiFi connecting ... \n");
-        break;
-    case WIFI_EVENT_STA_CONNECTED:
-        printf("WiFi connected ... \n");
-        break;
-    case WIFI_EVENT_STA_DISCONNECTED:
-        printf("WiFi lost connection ... \n");
-        break;
-    case IP_EVENT_STA_GOT_IP:
-        printf("WiFi got IP ... \n\n");
-        break;
-    default:
-        break;
-    }
-    */
+
 }
 
 char wifi_connection()
 {
-    char retorno = 0;
+    char retorno = NAO_CONECTOU;
     // 1 - Wi-Fi/LwIP Init Phase
 
     // esp_netif_init();                    // TCP/IP initiation 					s1.1
@@ -115,15 +97,12 @@ char wifi_connection()
     else
     {
         ESP_LOGE(TAG, "UNEXPECTED EVENT");
-        retorno = NAO_CONECTOU;
     }
 
     ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler));
     ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler));
     vEventGroupDelete(s_wifi_event_group);
 
-    // 4- Wi-Fi Connect Phase
-    // esp_wifi_connect();
     return retorno;
 }
 
@@ -150,14 +129,17 @@ esp_err_t users_get_handler(httpd_req_t *req){
     httpd_resp_sendstr_chunk(req, "[");
 
     bool first = true;
-    for (int i = 0; i < num_contas_cadastradas; i++) {
+    num_contas = get_num_contas();
+
+    for (int i = 0; i < num_contas; i++) {
         if (!first) httpd_resp_sendstr_chunk(req, ",");
         first = false;
+        conta_t conta = get_conta_por_indice(i); 
 
         char buf[128];
         snprintf(buf, sizeof(buf),
           "{\"chave\":\"%s\",\"nome\":\"%s\",\"saldo\":%.2f}",
-          contas_cadastradas[i].chave, contas_cadastradas[i].nome, contas_cadastradas[i].saldo);
+          conta.chave, conta.nome, conta.saldo);
         httpd_resp_sendstr_chunk(req, buf);
     }
 
@@ -170,28 +152,15 @@ esp_err_t users_post_handler(httpd_req_t *req){
 
     char buf[128];
     httpd_req_recv(req, buf, sizeof(buf));
-
-    if (num_contas_cadastradas == MAX_USERS){
-        return httpd_resp_sendstr(req, "LIMITE DE USUARIOS CADASTRADOS JA FOI ATINGIDO");
-    }
     
-
-    char chave[9], nome[64], saldo[16];
-    httpd_query_key_value(buf, "chave", chave, sizeof(chave));
-    httpd_query_key_value(buf, "nome", nome, sizeof(nome));
+    conta_t nova_conta = {0}; 
+    char saldo[16];
+    httpd_query_key_value(buf, "chave", nova_conta.chave, sizeof(nova_conta.chave));
+    httpd_query_key_value(buf, "nome", nova_conta.nome, sizeof(nova_conta.nome));
     httpd_query_key_value(buf, "saldo", saldo, sizeof(saldo));
 
-    for (int i = 0; i < num_contas_cadastradas; i++) {
-        if(strcmp(contas_cadastradas[i].chave,chave) == 0){
-            return httpd_resp_sendstr(req, "CARTAO JA FOI CADASTRADA");
-        }
-    }
-    strcpy(contas_cadastradas[num_contas_cadastradas].chave, chave);
-    strcpy(contas_cadastradas[num_contas_cadastradas].nome, nome);
-    contas_cadastradas[num_contas_cadastradas].saldo = atof(saldo);
-
-    ESP_LOGI("POST HANDLER","nova conta cadastrada (%d): %s, %s, %.2f\n",(num_contas_cadastradas+1), contas_cadastradas[num_contas_cadastradas].chave,contas_cadastradas[num_contas_cadastradas].nome, contas_cadastradas[num_contas_cadastradas].saldo);
-    num_contas_cadastradas ++;    
+    nova_conta.saldo = atof(saldo);
+    cadastra_conta(nova_conta);
     
     return httpd_resp_sendstr(req, "OK");
 }
@@ -201,30 +170,8 @@ esp_err_t users_delete_handler(httpd_req_t *req){
     httpd_req_get_url_query_str(req, buf, sizeof(buf));
     httpd_query_key_value(buf, "chave", chave, sizeof(chave));
 
-    if(num_contas_cadastradas == 0){
-        return httpd_resp_sendstr(req, "NAO EXISTE CONTA CADASTRADA");
-    }
+    remove_conta(chave);
 
-    bool achou = false;
-    for (int i = 0; i < num_contas_cadastradas; i++) {
-        if (!achou && strcmp(contas_cadastradas[i].chave, chave) == 0)
-        {
-            achou = true;
-        }
-
-        if (achou && i < num_contas_cadastradas - 1)
-        {
-            contas_cadastradas[i] = contas_cadastradas[i + 1];
-        }
-    }
-
-    if(!achou){
-        return httpd_resp_sendstr(req, "CONTA NAO ENCONTRADA");
-    }
-    ESP_LOGI("DELETE HANDLER","conta deletada: %s\n",chave);
-
-    num_contas_cadastradas --;
-    /*muda*/
     return httpd_resp_sendstr(req, "OK");
 
 }
@@ -245,21 +192,20 @@ esp_err_t users_delete_handler(httpd_req_t *req){
         .uri      = "/users",
         .method   = HTTP_GET,
         .handler  = users_get_handler,
-        .user_ctx = NULL
-    };
+        .user_ctx = NULL};
+
     httpd_uri_t uri_users_post = {
         .uri      = "/users",
         .method   = HTTP_POST,
         .handler  = users_post_handler,
-        .user_ctx = NULL
-    };
+        .user_ctx = NULL};
 
     httpd_uri_t uri_users_delete = {
         .uri      = "/users",
         .method   = HTTP_DELETE,   // ex: /users?del=ABCDEF01
         .handler  = users_delete_handler,
-        .user_ctx = NULL
-    };
+        .user_ctx = NULL};
+
 
 
 httpd_handle_t start_webserver(void)
@@ -295,7 +241,6 @@ void http_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    // vTaskDelay(pdMS_TO_TICKS(2000));
     if(wifi_connection() == NAO_CONECTOU) return;
     start_webserver();
 }
