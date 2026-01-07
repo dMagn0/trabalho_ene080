@@ -5,6 +5,7 @@ extern QueueHandle_t fila_sensor;
 
 struct dados_sensores {
     int gas;
+    int chamas;
     int temperatura;
     int umidade;
 };

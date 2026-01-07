@@ -11,10 +11,11 @@ void monitora_sensores(void *pvparameters){
     struct dados_sensores dados;
     while (1)
     {
-        ESP_LOGI("Display", "Recebendo valor médio de Temperatura e Umidade");
+        // ESP_LOGI("Display", "Recebendo valor médio de Temperatura e Umidade");
     
         xQueueReceive(fila_sensor, &dados, portMAX_DELAY);
         ESP_LOGI("Display", "Média gas: %d", dados.gas);
+        ESP_LOGI("Display", "Média chamas: %d", dados.chamas);
         ESP_LOGI("Display", "Média temperatura: %d", dados.temperatura);
         ESP_LOGI("Display", "Média umidade: %d", dados.umidade);    
         
@@ -32,19 +33,27 @@ void monitora_rfid(void *pvparameters){
         ESP_LOGI("LEITURA", "chave: %.*s", msize, data_m);
 
         apaga_oled();
-        conta_t* conta = {0};
-        switch (get_conta_por_chave(data_m, conta)){
+        conta_t conta;
+        switch (get_conta_por_chave(data_m, &conta)){
             case OP_CANCELADA: /*nao tem */
             break;
             case OP_INVALIDA:
+                ESP_LOGI("LEITURA", "DEBUG");
                 escreve_oled(data_m, msize, 3);
                 strcpy(linha_oled, "CARTAO NAO CADASTRADO");
                 escreve_oled(linha_oled, strlen(linha_oled), 1);
                 break;
             case OP_SUCESSO:
-                escreve_oled(conta->nome, strlen(conta->nome), 1);
-                snprintf(linha_oled, sizeof(linha_oled), "R$ %.2f", conta->saldo);
+                ESP_LOGI("LEITURA", "DEBUG");
+                // snprintf(linha_oled, sizeof(linha_oled), "%.31s", conta.nome);
+                // size_t len = strnlen(conta->nome, sizeof conta->nome);
+                saque(conta.chave,5);
+                escreve_oled(conta.nome, strlen(linha_oled), 1);
+                snprintf(linha_oled, sizeof(linha_oled), "R$ %.2f", conta.saldo);
                 escreve_oled(linha_oled, strlen(linha_oled), 3);
+            break;
+            default:
+                ESP_LOGI("LEITURA", "DEBUG default");
             break;
         }
     }
@@ -54,12 +63,12 @@ void app_main()
 {
     display_init();
     rfid_main();
-    dht11_main();
-    vTaskDelay(pdMS_TO_TICKS(5000));
+    // dht11_main();
+    vTaskDelay(pdMS_TO_TICKS(500));
     http_main();
 
-    xTaskCreate(monitora_sensores, "sensores", 2048, NULL, 2, NULL);
-    xTaskCreate(monitora_rfid, "rfid", 2048, NULL, 2, NULL);
+    // xTaskCreate(monitora_sensores, "sensores", 2048, NULL, 2, NULL);
+    xTaskCreate(monitora_rfid, "rfid", 4096, NULL, 2, NULL);
 
 }
 

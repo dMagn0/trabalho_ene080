@@ -20,6 +20,7 @@
 #include <driver/gpio.h>
 #include <esp_log.h>
 #include <dht11.h>
+#include "driver/adc.h"
 
 #include <inttypes.h>
 #include "rc522.h"
@@ -42,8 +43,8 @@
 
 #define DHT11_PIN 4
 
-#define SENSOR_GAS 36
-#define SENSOR_CHAMA 39
+#define SENSOR_GAS 36 //chanel 0
+#define SENSOR_CHAMA 39 //chanel 3
 #define SENSOR_MOVIMENTO 34
 
 #define RC522_SPI_BUS_GPIO_MISO    (19)

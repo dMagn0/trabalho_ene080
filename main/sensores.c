@@ -11,7 +11,9 @@ void leitura_sensor(void *pvparameters)
     {
         data_dht11 = DHT11_read();
 
-        dados.gas = 1;
+        
+        dados.gas = adc1_get_raw(ADC1_CHANNEL_0);
+        dados.chamas = adc1_get_raw(ADC1_CHANNEL_3);
         dados.temperatura = data_dht11.temperature;
         dados.umidade = data_dht11.humidity;
         
@@ -24,10 +26,14 @@ void leitura_sensor(void *pvparameters)
 void dht11_main(void)
 {
     DHT11_init(DHT11_PIN);
-    // struct dados_sensores dados;
+
+    adc1_config_width(ADC_WIDTH_BIT_12);                  // resolução 12 bits
+    adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_11); // atenuação para 0-3.9V
+    adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11); // atenuação para 0-3.9V
+
 
     fila_sensor = xQueueCreate(4, sizeof( struct dados_sensores ));
 
     /*tirar*/
-    // xTaskCreate(display_sens, "display", 2048, NULL, 2, NULL);
+    // xTaskCreate(leitura_sensor, "leitura de sensores", 2048, NULL, 2, NULL);
 }

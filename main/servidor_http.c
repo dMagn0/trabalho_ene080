@@ -129,7 +129,7 @@ esp_err_t users_get_handler(httpd_req_t *req){
     httpd_resp_sendstr_chunk(req, "[");
 
     bool first = true;
-    num_contas = get_num_contas();
+    int num_contas = get_num_contas();
 
     for (int i = 0; i < num_contas; i++) {
         if (!first) httpd_resp_sendstr_chunk(req, ",");
