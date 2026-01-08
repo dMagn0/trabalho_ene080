@@ -32,7 +32,7 @@ static void on_picc_state_changed(void *arg, esp_event_base_t base, int32_t even
         //printf("%s\n", uid_str);
 
         xMessageBufferSend(buffer_rfid, uid_str, sizeof(uid_str), portMAX_DELAY);
-        rc522_picc_print(picc);
+        // rc522_picc_print(picc);
 
     }
     else if (picc->state == RC522_PICC_STATE_IDLE && event->old_state >= RC522_PICC_STATE_ACTIVE) {
@@ -40,8 +40,19 @@ static void on_picc_state_changed(void *arg, esp_event_base_t base, int32_t even
     }
 }
 
+
+void rfid_pausa_leitura(){
+    rc522_pause(scanner);
+}
+void rfid_start(){
+    if(scanner.state == RC522_STATE_POLLING){
+        return;
+    }
+    rc522_start(scanner);
+}
+
 void rfid_main(){
-    buffer_rfid = xMessageBufferCreate(200);
+    buffer_rfid = xMessageBufferCreate(64);
 
     rc522_spi_create(&driver_config, &driver);
     rc522_driver_install(driver);

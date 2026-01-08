@@ -39,19 +39,13 @@ Operacao get_conta_por_chave(char* chave, conta_t* conta){
 
     normaliza_chave(chave, chave_normalizada);
     
-    printf("n = %d\nch_n = %s\nch = %s\ncadas = %s\n", num_contas_cadastradas, chave_normalizada,chave,contas_cadastradas[0].chave);
-    printf("0");
-
     for (int i = 0; i < num_contas_cadastradas; i++) {
-        printf("1");
         if (strcmp(contas_cadastradas[i].chave, chave_normalizada) == 0) {
-            printf("2");
             *conta = contas_cadastradas[i];
             return OP_SUCESSO;
         }
     }
-    printf("3");
-
+    *conta = (conta_t){"FFFFFFFF","Anonimo",0};
     return OP_INVALIDA;
 }
 
@@ -138,22 +132,22 @@ Operacao saque(char* chave, float valor){
     conta_t* conta = {0};
 
     if(valor < 0 ){
-        ESP_LOGI(TAG,"Valor inválido");
+        // ESP_LOGI(TAG,"Valor inválido");
         return OP_CANCELADA;
     }
     
     if (get_conta(chave, &conta) != OP_SUCESSO){
-        ESP_LOGW(TAG,"CONTA NAO ENCONTRADA");
+        // ESP_LOGW(TAG,"CONTA NAO ENCONTRADA");
         return OP_INVALIDA;
     }
     
     if(valor > conta->saldo){
-        ESP_LOGI(TAG,"Valor inválido");
+        // ESP_LOGI(TAG,"Valor inválido");
         return OP_CANCELADA;
     }
     conta->saldo -= valor;
     DINHEIRO += valor;
-    ESP_LOGI(TAG,"Valor retirado");
+    // ESP_LOGI(TAG,"Valor retirado");
     return OP_SUCESSO;
     
 }

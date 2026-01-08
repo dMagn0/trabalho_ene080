@@ -6,7 +6,6 @@
 
 
 
-
 void monitora_sensores(void *pvparameters){
     struct dados_sensores dados;
     while (1)
@@ -23,39 +22,62 @@ void monitora_sensores(void *pvparameters){
 
 }
 
+static int TEMPO_DE_BLOQUEIO_DA_FILA = 400;
 void monitora_rfid(void *pvparameters){
     char data_m[200];
     char linha_oled[32];
     size_t msize;
     while (1)
     {
+        rfid_start();
         msize = xMessageBufferReceive(buffer_rfid, data_m, sizeof(data_m), portMAX_DELAY);
-        ESP_LOGI("LEITURA", "chave: %.*s", msize, data_m);
+        rfid_pausa_leitura();
+
+        // ESP_LOGI("LEITURA", "chave: %.*s", msize, data_m);
 
         apaga_oled();
         conta_t conta;
         switch (get_conta_por_chave(data_m, &conta)){
-            case OP_CANCELADA: /*nao tem */
-            break;
             case OP_INVALIDA:
-                ESP_LOGI("LEITURA", "DEBUG");
+
                 escreve_oled(data_m, msize, 3);
-                strcpy(linha_oled, "CARTAO NAO CADASTRADO");
+
+                strcpy(linha_oled, "CARTAO NAO");
                 escreve_oled(linha_oled, strlen(linha_oled), 1);
-                break;
+
+                strcpy(linha_oled, "CADASTRADO");
+                escreve_oled(linha_oled, strlen(linha_oled), 2);
+
+            break;
             case OP_SUCESSO:
-                ESP_LOGI("LEITURA", "DEBUG");
-                // snprintf(linha_oled, sizeof(linha_oled), "%.31s", conta.nome);
-                // size_t len = strnlen(conta->nome, sizeof conta->nome);
-                saque(conta.chave,5);
-                escreve_oled(conta.nome, strlen(linha_oled), 1);
-                snprintf(linha_oled, sizeof(linha_oled), "R$ %.2f", conta.saldo);
-                escreve_oled(linha_oled, strlen(linha_oled), 3);
+                switch (saque(conta.chave,5)){
+                    case OP_CANCELADA:
+                        escreve_oled(conta.nome, strlen(conta.nome), 1);
+                        
+                        strcpy(linha_oled, "Acesso negado");
+                        escreve_oled(linha_oled, strlen(linha_oled), 2);
+
+                        snprintf(linha_oled, sizeof(linha_oled), "R$ %.2f", conta.saldo);
+                        escreve_oled(linha_oled, strlen(linha_oled), 3);    
+
+                    break;
+                    case OP_SUCESSO:
+                        escreve_oled(conta.nome, strlen(conta.nome), 1);
+                        snprintf(linha_oled, sizeof(linha_oled), "R$ %.2f", conta.saldo);
+                        escreve_oled(linha_oled, strlen(linha_oled), 3);
+
+                    break;
+                    default:
+                        ESP_LOGE("LEITURA", "Falha no saque.");
+                    break;
+                }
             break;
             default:
-                ESP_LOGI("LEITURA", "DEBUG default");
+                ESP_LOGE("LEITURA", "Falha no get conta.");
             break;
         }
+
+        vTaskDelay(TEMPO_DE_BLOQUEIO_DA_FILA);
     }
 }
 
