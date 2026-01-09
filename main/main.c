@@ -7,11 +7,11 @@
 
 
 void monitora_sensores(void *pvparameters){
-    struct dados_sensores dados;
+    dados_sensores dados = {0};
     while (1)
     {
         // ESP_LOGI("Display", "Recebendo valor médio de Temperatura e Umidade");
-    
+        //atualiza_dados_sensores(dados);
         xQueueReceive(fila_sensor, &dados, portMAX_DELAY);
         ESP_LOGI("Display", "Média gas: %d", dados.gas);
         ESP_LOGI("Display", "Média chamas: %d", dados.chamas);

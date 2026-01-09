@@ -3,12 +3,12 @@
 
 extern QueueHandle_t fila_sensor;
 
-struct dados_sensores {
+typedef struct{
     int gas;
     int chamas;
     int temperatura;
     int umidade;
-};
+}dados_sensores;
 
 void leitura_sensor(void *pvparameters);
 

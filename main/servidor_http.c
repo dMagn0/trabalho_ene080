@@ -2,8 +2,18 @@
 
 extern const uint8_t index_html_start[] asm("_binary_index_html_start");
 extern const uint8_t index_html_end[]   asm("_binary_index_html_end");
+
+extern const uint8_t cadastro_html_start[] asm("_binary_cadastro_html_start");
+extern const uint8_t cadastro_html_end[]   asm("_binary_cadastro_html_end");
+
+extern const uint8_t monitoramento_html_start[] asm("_binary_monitoramento_html_start");
+extern const uint8_t monitoramento_html_end[]   asm("_binary_monitoramento_html_end");
+
 extern const uint8_t app_js_start[] asm("_binary_app_js_start");
 extern const uint8_t app_js_end[]   asm("_binary_app_js_end");
+
+extern const uint8_t app_monit_js_start[] asm("_binary_app_monit_js_start");
+extern const uint8_t app_monit_js_end[]   asm("_binary_app_monit_js_end");
 
 static const char *TAG = "ESP32 Server";
 
@@ -106,7 +116,7 @@ char wifi_connection()
     return retorno;
 }
 
-esp_err_t get_handler(httpd_req_t *req){
+esp_err_t get_index(httpd_req_t *req){
     const size_t html_size = index_html_end - index_html_start;
 
     httpd_resp_set_type(req, "text/html");
@@ -114,7 +124,7 @@ esp_err_t get_handler(httpd_req_t *req){
 
     return ESP_OK;
 }
-esp_err_t get_app_handler(httpd_req_t *req){
+esp_err_t get_app(httpd_req_t *req){
     const size_t html_size = app_js_end - app_js_start;
 
     httpd_resp_set_type(req, "application/javascript");
@@ -122,8 +132,61 @@ esp_err_t get_app_handler(httpd_req_t *req){
 
     return ESP_OK;
 }
+esp_err_t get_app_monit(httpd_req_t *req){
+    const size_t html_size = app_monit_js_end - app_monit_js_start;
 
-esp_err_t users_get_handler(httpd_req_t *req){
+    httpd_resp_set_type(req, "application/javascript");
+    httpd_resp_send(req, (const char *)app_monit_js_start, html_size);
+
+    return ESP_OK;
+}
+
+esp_err_t get_cadastro(httpd_req_t *req){
+    const size_t html_size = cadastro_html_end - cadastro_html_start;
+
+    httpd_resp_set_type(req, "text/html");
+    httpd_resp_send(req, (const char *)cadastro_html_start, html_size);
+
+    return ESP_OK;
+}
+esp_err_t get_monitoramento(httpd_req_t *req){
+    const size_t html_size = monitoramento_html_end - monitoramento_html_start;
+
+    httpd_resp_set_type(req, "text/html");
+    httpd_resp_send(req, (const char *)monitoramento_html_start, html_size);
+
+    return ESP_OK;
+}
+
+static dados_sensores dados_armazenados;
+void atualiza_dados_sensores(dados_sensores novo_dado){
+    /*pensa*/
+}
+esp_err_t get_dados_sensores(httpd_req_t *req){
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_sendstr_chunk(req, "[");
+
+    bool first = true;
+    int num_contas = get_num_contas();
+
+    for (int i = 0; i < num_contas; i++) {
+        if (!first) httpd_resp_sendstr_chunk(req, ",");
+        first = false;
+        conta_t conta = get_conta_por_indice(i); 
+
+        char buf[128];
+        snprintf(buf, sizeof(buf),
+          "{\"chave\":\"%s\",\"nome\":\"%s\",\"saldo\":%.2f}",
+          conta.chave, conta.nome, conta.saldo);
+        httpd_resp_sendstr_chunk(req, buf);
+    }
+
+    httpd_resp_sendstr_chunk(req, "]");
+    httpd_resp_sendstr_chunk(req, NULL);
+    return ESP_OK;
+}
+
+esp_err_t users_get(httpd_req_t *req){
 
     httpd_resp_set_type(req, "application/json");
     httpd_resp_sendstr_chunk(req, "[");
@@ -148,7 +211,7 @@ esp_err_t users_get_handler(httpd_req_t *req){
     return ESP_OK;
 }
 
-esp_err_t users_post_handler(httpd_req_t *req){
+esp_err_t users_post(httpd_req_t *req){
 
     char buf[128];
     httpd_req_recv(req, buf, sizeof(buf));
@@ -165,7 +228,7 @@ esp_err_t users_post_handler(httpd_req_t *req){
     return httpd_resp_sendstr(req, "OK");
 }
 
-esp_err_t users_delete_handler(httpd_req_t *req){
+esp_err_t users_delete(httpd_req_t *req){
     char buf[64], chave[9];
     httpd_req_get_url_query_str(req, buf, sizeof(buf));
     httpd_query_key_value(buf, "chave", chave, sizeof(chave));
@@ -180,30 +243,49 @@ esp_err_t users_delete_handler(httpd_req_t *req){
     httpd_uri_t uri_get = {
         .uri = "/",
         .method = HTTP_GET,
-        .handler = get_handler,
+        .handler = get_index,
         .user_ctx = NULL};
+    
+    httpd_uri_t uri_get_monitoramento = {
+        .uri = "/monitoramento",
+        .method = HTTP_GET,
+        .handler = get_monitoramento,
+        .user_ctx = NULL};
+    httpd_uri_t uri_get_dados_sensores = {
+        .uri = "/monitoramento/dados",
+        .method = HTTP_GET,
+        .handler = get_dados_sensores,
+        .user_ctx = NULL};
+    httpd_uri_t uri_app_monit_get = {
+        .uri = "/app_monit.js",
+        .method = HTTP_GET,
+        .handler = get_app_monit,
+        .user_ctx = NULL};
+        
     httpd_uri_t uri_app_get = {
         .uri = "/app.js",
         .method = HTTP_GET,
-        .handler = get_app_handler,
+        .handler = get_app,
         .user_ctx = NULL};
-
+    httpd_uri_t uri_get_cadastro = {
+        .uri = "/cadastro",
+        .method = HTTP_GET,
+        .handler = get_cadastro,
+        .user_ctx = NULL};
     httpd_uri_t uri_users_get = {
         .uri      = "/users",
         .method   = HTTP_GET,
-        .handler  = users_get_handler,
+        .handler  = users_get,
         .user_ctx = NULL};
-
     httpd_uri_t uri_users_post = {
         .uri      = "/users",
         .method   = HTTP_POST,
-        .handler  = users_post_handler,
+        .handler  = users_post,
         .user_ctx = NULL};
-
     httpd_uri_t uri_users_delete = {
         .uri      = "/users",
         .method   = HTTP_DELETE,   // ex: /users?del=ABCDEF01
-        .handler  = users_delete_handler,
+        .handler  = users_delete,
         .user_ctx = NULL};
 
 
@@ -215,7 +297,13 @@ httpd_handle_t start_webserver(void)
     if (httpd_start(&server, &config) == ESP_OK)
     {
         httpd_register_uri_handler(server, &uri_get);
+
+        httpd_register_uri_handler(server, &uri_app_monit_get);
+        httpd_register_uri_handler(server, &uri_get_monitoramento);
+        httpd_register_uri_handler(server, &uri_get_dados_sensores);
+        
         httpd_register_uri_handler(server, &uri_app_get);
+        httpd_register_uri_handler(server, &uri_get_cadastro);
         httpd_register_uri_handler(server, &uri_users_get);
         httpd_register_uri_handler(server, &uri_users_post);
         httpd_register_uri_handler(server, &uri_users_delete);

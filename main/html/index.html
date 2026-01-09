@@ -2,101 +2,51 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Gerenciamento de Usuários</title>
+    <title>Restaurante Samuel Picanhas</title>
 
     <style>
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #f4f6f8;
-            padding: 20px;
+            margin: 1;
+            height: 100vh;
+            display: flex;
+            /* justify-content: center;
+            align-items: ; */
+            background-color: #313647;
+            font-family: Arial, sans-serif;
         }
 
-        h1 {
-            text-align: center;
-        }
-
-        .form-container {
-            width: 80%;
-            margin: 20px auto;
-            background: #fff;
-            padding: 15px;
-            border-radius: 6px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .form-container input {
-            padding: 8px;
-            margin-right: 10px;
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         button {
-            padding: 8px 12px;
+            padding: 20px 40px;
+            font-size: 20px;
             cursor: pointer;
-        }
-
-        table {
-            border-collapse: collapse;
-            margin: auto;
-            width: 80%;
-            background-color: #ffffff;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px 12px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #2f80ed;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .hex {
-            font-family: monospace;
-        }
-
-        .btn-remove {
-            background-color: #e63946;
-            color: white;
             border: none;
             border-radius: 4px;
-            padding: 6px 10px;
+            background-color: #435663;
+            color: #FFF8D4;
+        }
+
+        button:hover {
+            background-color: #4356637e;
         }
     </style>
 </head>
 <body>
 
-<h1>Usuários Cadastrados</h1>
+    <div class="menu">
+        <button onclick="location.href='/cadastro.html'">
+            Cadastro
+        </button>
 
-<!-- FORMULÁRIO -->
-<div class="form-container">
-    <form id="formAdd">
-        <input type="text" name="chave" placeholder="Chave HEX (8)" maxlength="8" required>
-        <input type="text" name="nome" placeholder="Nome" required>
-        <input type="number" name="saldo" placeholder="Saldo" step="0.01" required>
-        <button type="submit">Adicionar</button>
-    </form>
-</div>
-
-<!-- TABELA -->
-<table>
-    <thead>
-        <tr>
-            <th>Chave (HEX)</th>
-            <th>Nome</th>
-            <th>Saldo</th>
-            <th>Ação</th>
-        </tr>
-    </thead>
-    <tbody id="tabelaUsuarios"></tbody>
-</table>
-
-<script src="app.js"></script>
+        <button onclick="location.href='/cadastro.html'">
+            Monitoramento
+        </button>
+    </div>
 
 </body>
 </html>

@@ -1,10 +1,10 @@
 #include "sensores.h"
 
-QueueHandle_t fila_sensor;
+QueueHandle_t fila_sensor, fila_dado_to_http;
 
 void leitura_sensor(void *pvparameters)
 {
-    struct dados_sensores dados;
+    dados_sensores dados;
     struct dht11_reading data_dht11;
 
     while (1)
@@ -17,7 +17,7 @@ void leitura_sensor(void *pvparameters)
         dados.temperatura = data_dht11.temperature;
         dados.umidade = data_dht11.humidity;
         
-        xQueueSendToBack(fila_sensor, &dados, portMAX_DELAY);
+        xQueueOverwrite(fila_sensor, &dados, portMAX_DELAY);
 
         vTaskDelay(pdMS_TO_TICKS(500));  // Aguarda 0,5 segundos
     }
@@ -32,7 +32,7 @@ void dht11_main(void)
     adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11); // atenuação para 0-3.9V
 
 
-    fila_sensor = xQueueCreate(4, sizeof( struct dados_sensores ));
+    fila_sensor = xQueueCreate(1, sizeof( dados_sensores ));
 
     /*tirar*/
     // xTaskCreate(leitura_sensor, "leitura de sensores", 2048, NULL, 2, NULL);
