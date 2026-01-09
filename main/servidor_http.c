@@ -158,33 +158,36 @@ esp_err_t get_monitoramento(httpd_req_t *req){
     return ESP_OK;
 }
 
-static dados_sensores dados_armazenados;
-void atualiza_dados_sensores(dados_sensores novo_dado){
-    /*pensa*/
-}
+// static dados_sensores dados_armazenados;
+// void atualiza_dados_sensores(dados_sensores novo_dado){
+//     /*pensa*/
+// }
 esp_err_t get_dados_sensores(httpd_req_t *req){
     httpd_resp_set_type(req, "application/json");
-    httpd_resp_sendstr_chunk(req, "[");
 
-    bool first = true;
-    int num_contas = get_num_contas();
+    dados_sensores dados;
 
-    for (int i = 0; i < num_contas; i++) {
-        if (!first) httpd_resp_sendstr_chunk(req, ",");
-        first = false;
-        conta_t conta = get_conta_por_indice(i); 
+    xQueuePeek(fila_sensor_to_servidor, &dados, portMAX_DELAY);
 
-        char buf[128];
-        snprintf(buf, sizeof(buf),
-          "{\"chave\":\"%s\",\"nome\":\"%s\",\"saldo\":%.2f}",
-          conta.chave, conta.nome, conta.saldo);
-        httpd_resp_sendstr_chunk(req, buf);
-    }
+    char buf[128];
+    snprintf(buf, sizeof(buf),
+        "{"
+        "\"gas\":%d,"
+        "\"chamas\":%d,"
+        "\"temperatura\":%d,"
+        "\"umidade\":%d"
+        "}",
+        dados.gas,
+        dados.chamas,
+        dados.temperatura,
+        dados.umidade
+    );
 
-    httpd_resp_sendstr_chunk(req, "]");
-    httpd_resp_sendstr_chunk(req, NULL);
+    httpd_resp_sendstr(req, buf);
+
     return ESP_OK;
 }
+
 
 esp_err_t users_get(httpd_req_t *req){
 

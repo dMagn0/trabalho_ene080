@@ -1,6 +1,6 @@
 #include "sensores.h"
 
-QueueHandle_t fila_sensor, fila_dado_to_http;
+QueueHandle_t fila_sensor, fila_sensor_to_servidor;;
 
 void leitura_sensor(void *pvparameters)
 {
@@ -17,6 +17,7 @@ void leitura_sensor(void *pvparameters)
         dados.temperatura = data_dht11.temperature;
         dados.umidade = data_dht11.humidity;
         
+        xQueueOverwrite(fila_sensor_to_servidor, &dados, portMAX_DELAY);
         xQueueOverwrite(fila_sensor, &dados, portMAX_DELAY);
 
         vTaskDelay(pdMS_TO_TICKS(500));  // Aguarda 0,5 segundos
@@ -33,6 +34,7 @@ void dht11_main(void)
 
 
     fila_sensor = xQueueCreate(1, sizeof( dados_sensores ));
+    fila_sensor_to_servidor = xQueueCreate(1, sizeof( dados_sensores ));
 
     /*tirar*/
     // xTaskCreate(leitura_sensor, "leitura de sensores", 2048, NULL, 2, NULL);

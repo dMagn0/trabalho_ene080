@@ -2,6 +2,7 @@
 #include "utilities.h"
 
 extern QueueHandle_t fila_sensor;
+extern QueueHandle_t fila_sensor_to_servidor;
 
 typedef struct{
     int gas;
