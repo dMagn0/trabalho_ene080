@@ -167,7 +167,7 @@ esp_err_t get_dados_sensores(httpd_req_t *req){
 
     dados_sensores dados;
 
-    xQueuePeek(fila_sensor_to_servidor, &dados, portMAX_DELAY);
+    xQueuePeek(fila_sensor_to_servidor, &dados, 0);
 
     char buf[128];
     snprintf(buf, sizeof(buf),
@@ -183,6 +183,7 @@ esp_err_t get_dados_sensores(httpd_req_t *req){
         dados.umidade
     );
 
+    // printf("%s", buf);
     httpd_resp_sendstr(req, buf);
 
     return ESP_OK;
@@ -299,14 +300,14 @@ httpd_handle_t start_webserver(void)
     httpd_handle_t server = NULL;
     if (httpd_start(&server, &config) == ESP_OK)
     {
-        httpd_register_uri_handler(server, &uri_get);
+         httpd_register_uri_handler(server, &uri_get);
 
         httpd_register_uri_handler(server, &uri_app_monit_get);
         httpd_register_uri_handler(server, &uri_get_monitoramento);
         httpd_register_uri_handler(server, &uri_get_dados_sensores);
         
         httpd_register_uri_handler(server, &uri_app_get);
-        httpd_register_uri_handler(server, &uri_get_cadastro);
+        // httpd_register_uri_handler(server, &uri_get_cadastro);
         httpd_register_uri_handler(server, &uri_users_get);
         httpd_register_uri_handler(server, &uri_users_post);
         httpd_register_uri_handler(server, &uri_users_delete);

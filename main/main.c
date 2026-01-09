@@ -85,11 +85,11 @@ void app_main()
 {
     display_init();
     rfid_main();
-    // dht11_main();
+    dht11_main();
     vTaskDelay(pdMS_TO_TICKS(500));
     http_main();
 
-    // xTaskCreate(monitora_sensores, "sensores", 2048, NULL, 2, NULL);
+    xTaskCreate(monitora_sensores, "sensores", 2048, NULL, 2, NULL);
     xTaskCreate(monitora_rfid, "rfid", 4096, NULL, 2, NULL);
 
 }

@@ -17,6 +17,24 @@ static rc522_spi_config_t driver_config = {
     .rst_io_num = RC522_SCANNER_GPIO_RST,
 };
 
+typedef enum
+{
+    RC522_STATE_UNDEFINED = 0,
+    RC522_STATE_CREATED,
+    RC522_STATE_POLLING, /*<! Scanning for nearby PICCs */
+    RC522_STATE_PAUSED,
+} rc522_state_t;
+struct rc522
+{
+    rc522_config_t *config;               /*<! Configuration */
+    bool exit_requested;                  /*<! Indicates whether polling task exit is requested */
+    TaskHandle_t task_handle;             /*<! Handle of task */
+    esp_event_loop_handle_t event_handle; /*<! Handle of event loop */
+    rc522_state_t state;                  /*<! Current state */
+    rc522_picc_t picc;
+    EventGroupHandle_t bits;
+};
+
 static rc522_driver_handle_t driver;
 static rc522_handle_t scanner;
 
@@ -45,7 +63,7 @@ void rfid_pausa_leitura(){
     rc522_pause(scanner);
 }
 void rfid_start(){
-    if(scanner.state == RC522_STATE_POLLING){
+    if(scanner->state == 2/*RC522_STATE_POLLING*/){
         return;
     }
     rc522_start(scanner);
