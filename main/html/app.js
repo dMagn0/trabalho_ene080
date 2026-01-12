@@ -1,6 +1,6 @@
 
 async function carregarUsuarios() {
-    const resp = await fetch("/users");
+    const resp = await fetch("/get_data/cadastro");
     const usuarios = await resp.json();
 
     const tbody = document.getElementById("tabelaUsuarios");

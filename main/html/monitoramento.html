@@ -20,19 +20,13 @@
         }
 
         .campo {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .campo label {
             display: block;
             font-weight: bold;
             margin-bottom: 4px;
-        }
-
-        .campo input {
-            width: 100%;
-            padding: 8px;
-            font-size: 16px;
         }
 
         .barra-container {
@@ -47,13 +41,9 @@
 
         .barra {
             height: 100%;
-            width: 80%;
+            width: 0%;
             background-color: #A3B087;
             transition: width 0.3s ease;
-        }
-
-        .campo {
-            margin-bottom: 10px;
         }
 
         .lbl {
@@ -71,38 +61,76 @@
             font-family: Consolas, monospace;
         }
 
+        /* ===== Indicadores de risco ===== */
 
+        .risk {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .ok {
+            background-color: #ffffff00;
+        }
+
+        .alerta {
+            background-color: #ffab00; /* amarelo */
+        }
+
+        .critico {
+            background-color: #d50000; /* vermelho */
+        }
     </style>
 </head>
+
 <body>
 
-<h2 style = "color: white">Monitoramento</h2>
+<h2 style="color: white">Monitoramento</h2>
 
 <div class="campo">
-    <label class="lbl">GAS: <span id="gas">--</span></label>
+    <label class="lbl">
+        GAS:
+        <span id="gas">--</span>
+        <span id="risk_gas" class="risk ok"></span>
+    </label>
 </div>
 
 <div class="campo">
-    <label class="lbl">CHAMAS: <span id="chamas">--</span></label>
+    <label class="lbl">
+        CHAMAS:
+        <span id="chamas">--</span>
+        <span id="risk_chamas" class="risk ok"></span>
+    </label>
 </div>
 
 <div class="campo">
-    <label class="lbl">TEMPERATURA: <span id="temperatura">--</span></label>
+    <label class="lbl">
+        TEMPERATURA:
+        <span id="temperatura">--</span>
+        <span id="risk_temp" class="risk ok"></span>
+    </label>
 </div>
+
 <div class="barra-container">
     <div id="barra_temp" class="barra"></div>
 </div>
 
 <div class="campo">
-    <label class="lbl">UMIDADE: <span id="umidade">--</span></label>
+    <label class="lbl">
+        UMIDADE:
+        <span id="umidade">--</span>
+        <span id="risk_umi" class="risk ok"></span>
+    </label>
 </div>
+
 <div class="barra-container">
     <div id="barra_umi" class="barra"></div>
 </div>
 
-
-
-<script src = "app_monit.js"></script>
+<script src="app/app_monit.js"></script>
 
 </body>
+
 </html>
