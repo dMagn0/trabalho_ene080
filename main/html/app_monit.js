@@ -21,39 +21,44 @@ function atualizarDados() {
             let umid = Math.max(0, Math.min(dados.umidade, 100));
             document.getElementById("barra_umi").style.width = umid + "%";
 
-            let riskGas = document.getElementById("risk_gas");
+            /* GAS */
+            let lblGas = document.getElementById("lbl_gas_alert");
             if (dados.gas > 60) {
-                riskGas.className = "risk critico";
+                lblGas.className = "lbl critico";
             } else if (dados.gas > 30) {
-                riskGas.className = "risk alerta";
+                lblGas.className = "lbl alerta";
             } else {
-                riskGas.className = "risk ok";
+                lblGas.className = "lbl ok";
             }
 
-            let riskChamas = document.getElementById("risk_chamas");
+            /* CHAMAS */
+            let lblChamas = document.getElementById("lbl_chamas_alert");
             if (dados.chamas > 0) {
-                riskChamas.className = "risk critico";
+                lblChamas.className = "lbl critico";
             } else {
-                riskChamas.className = "risk ok";
+                lblChamas.className = "lbl ok";
             }
 
-            let riskTemp = document.getElementById("risk_temp");
+            /* TEMPERATURA */
+            let lblTemp = document.getElementById("lbl_temp_alert");
             if (dados.temperatura > 40 || dados.temperatura < 10) {
-                riskTemp.className = "risk critico";
+                lblTemp.className = "lbl critico";
             } else if (dados.temperatura > 35 || dados.temperatura < 20) {
-                riskTemp.className = "risk alerta";
+                lblTemp.className = "lbl alerta";
             } else {
-                riskTemp.className = "risk ok";
+                lblTemp.className = "lbl ok";
             }
 
-            let riskUmi = document.getElementById("risk_umi");
+            /* UMIDADE */
+            let lblUmi = document.getElementById("lbl_umi_alert");
             if (dados.umidade < 30 || dados.umidade > 70) {
-                riskTemp.className = "risk critico";
+                lblUmi.className = "lbl critico";
             } else if (dados.umidade < 40 || dados.umidade > 60) {
-                riskUmi.className = "risk alerta";
+                lblUmi.className = "lbl alerta";
             } else {
-                riskUmi.className = "risk ok";
+                lblUmi.className = "lbl ok";
             }
+
         })
         .catch(err => {
             console.error("Falha ao atualizar dados:", err);

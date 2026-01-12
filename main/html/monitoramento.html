@@ -21,6 +21,9 @@
 
         .campo {
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .campo label {
@@ -93,24 +96,24 @@
     <label class="lbl">
         GAS:
         <span id="gas">--</span>
-        <span id="risk_gas" class="risk ok"></span>
     </label>
+    <label id="lbl_gas_alert" class="lbl ok" style="width:15px; height:22px;"></label>
 </div>
 
 <div class="campo">
     <label class="lbl">
         CHAMAS:
         <span id="chamas">--</span>
-        <span id="risk_chamas" class="risk ok"></span>
     </label>
+    <label id="lbl_chamas_alert" class="lbl ok" style="width:15px; height:22px;"></label>
 </div>
 
 <div class="campo">
     <label class="lbl">
         TEMPERATURA:
         <span id="temperatura">--</span>
-        <span id="risk_temp" class="risk ok"></span>
     </label>
+    <label id="lbl_temp_alert" class="lbl ok" style="width:15px; height:22px;"></label>
 </div>
 
 <div class="barra-container">
@@ -121,8 +124,8 @@
     <label class="lbl">
         UMIDADE:
         <span id="umidade">--</span>
-        <span id="risk_umi" class="risk ok"></span>
     </label>
+    <label id="lbl_umi_alert" class="lbl ok" style="width:15px; height:22px;"></label>
 </div>
 
 <div class="barra-container">
@@ -132,5 +135,6 @@
 <script src="app/app_monit.js"></script>
 
 </body>
+
 
 </html>
