@@ -17,7 +17,7 @@ void monitora_sensores(void *pvparameters){
         ESP_LOGI("Display", "Média chamas: %d", dados.chamas);
         ESP_LOGI("Display", "Média temperatura: %d", dados.temperatura);
         ESP_LOGI("Display", "Média umidade: %d", dados.umidade);    
-        
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 
 }

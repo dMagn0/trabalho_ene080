@@ -118,17 +118,16 @@ char wifi_connection()
 
 esp_err_t get_app(httpd_req_t *req){
     const char *uri = req->uri;
-
+    printf("%s", uri);
     if (strcmp(uri, "/app/app.js") == 0) {
-
         httpd_resp_set_type(req, "application/javascript");
-        httpd_resp_send(req, app_js_start, app_js_end - app_js_start);
+        httpd_resp_send(req, (const char *)app_js_start, app_js_end - app_js_start);
         return ESP_OK;
 
     } else if (strcmp(uri, "/app/app_monit.js") == 0) {
 
         httpd_resp_set_type(req, "application/javascript");
-        httpd_resp_send(req, app_monit_js_start, app_monit_js_end - app_monit_js_start);
+        httpd_resp_send(req, (const char *)app_monit_js_start, app_monit_js_end - app_monit_js_start);
         return ESP_OK;
     }
 
@@ -138,20 +137,21 @@ esp_err_t get_app(httpd_req_t *req){
 }
 esp_err_t get_pages(httpd_req_t *req){
     const char *uri = req->uri;
-
+    /*printf("sadsadsad");
+    printf("%s", uri);*/
     if (strcmp(uri, "/") == 0) {
         httpd_resp_set_type(req, "text/html");
-        httpd_resp_send(req, index_html_start, index_html_end - index_html_start);
+        httpd_resp_send(req, (const char *)index_html_start, index_html_end - index_html_start);
         return ESP_OK;
 
     } else if (strcmp(uri, "/cadastro") == 0) {
         httpd_resp_set_type(req, "text/html");
-        httpd_resp_send(req, cadastro_html_start, cadastro_html_end - cadastro_html_start);
+        httpd_resp_send(req, (const char *)cadastro_html_start, cadastro_html_end - cadastro_html_start);
         return ESP_OK;
 
     } else if (strcmp(uri, "/monitoramento") == 0) {
         httpd_resp_set_type(req, "text/html");
-        httpd_resp_send(req, monitoramento_html_start, monitoramento_html_end - monitoramento_html_start);
+        httpd_resp_send(req, (const char *)monitoramento_html_start, monitoramento_html_end - monitoramento_html_start);
         return ESP_OK;
     }
 
@@ -286,16 +286,19 @@ esp_err_t users_delete(httpd_req_t *req){
 httpd_handle_t start_webserver(void)
 {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.uri_match_fn = httpd_uri_match_wildcard;
+    // printf("sadsadsad");
+
     httpd_handle_t server = NULL;
     if (httpd_start(&server, &config) == ESP_OK)
     {
-        httpd_register_uri_handler(server, &uri_pages);
         httpd_register_uri_handler(server, &uri_app);
-
         httpd_register_uri_handler(server, &uri_get_data);
-        
+
         httpd_register_uri_handler(server, &uri_users_post);
         httpd_register_uri_handler(server, &uri_users_delete);
+        
+        httpd_register_uri_handler(server, &uri_pages);
     }
     return server;
 }
