@@ -25,6 +25,7 @@ static EventGroupHandle_t s_wifi_event_group;
 #define NAO_CONECTOU 0
 #define CONECTOU 1
 
+MessageBufferHandle_t buffer_ip;
 
 static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -48,8 +49,13 @@ static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_b
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
+        char ip_str[16];
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-        ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+
+        sprintf(ip_str, IPSTR, IP2STR(&event->ip_info.ip));
+        ESP_LOGI(TAG, "got ip: %s", ip_str);
+
+        xMessageBufferSend(buffer_ip, ip_str, strlen(ip_str) + 1, portMAX_DELAY);
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
@@ -118,7 +124,6 @@ char wifi_connection()
 
 esp_err_t get_app(httpd_req_t *req){
     const char *uri = req->uri;
-    printf("%s", uri);
     if (strcmp(uri, "/app/app.js") == 0) {
         httpd_resp_set_type(req, "application/javascript");
         httpd_resp_send(req, (const char *)app_js_start, app_js_end - app_js_start);
@@ -137,8 +142,6 @@ esp_err_t get_app(httpd_req_t *req){
 }
 esp_err_t get_pages(httpd_req_t *req){
     const char *uri = req->uri;
-    /*printf("sadsadsad");
-    printf("%s", uri);*/
     if (strcmp(uri, "/") == 0) {
         httpd_resp_set_type(req, "text/html");
         httpd_resp_send(req, (const char *)index_html_start, index_html_end - index_html_start);
@@ -287,7 +290,6 @@ httpd_handle_t start_webserver(void)
 {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.uri_match_fn = httpd_uri_match_wildcard;
-    // printf("sadsadsad");
 
     httpd_handle_t server = NULL;
     if (httpd_start(&server, &config) == ESP_OK)
@@ -313,6 +315,7 @@ void stop_webserver(httpd_handle_t server)
 
 void http_main(void)
 {
+    buffer_ip = xMessageBufferCreate(64);
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {

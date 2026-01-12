@@ -12,10 +12,13 @@ void leitura_sensor(void *pvparameters)
         data_dht11 = DHT11_read();
 
         
-        dados.gas = adc1_get_raw(ADC1_CHANNEL_0);
-        dados.chamas = adc1_get_raw(ADC1_CHANNEL_3);
+        int gas_raw = adc1_get_raw(ADC1_CHANNEL_0);
+        //dados.chamas = adc1_get_raw(ADC1_CHANNEL_3);
+        dados.chamas = gpio_get_level(SENSOR_CHAMA);
         dados.temperatura = data_dht11.temperature;
         dados.umidade = data_dht11.humidity;
+
+        dados.gas = gas_raw * 100 / 4095;
         
         xQueueOverwrite(fila_sensor_to_servidor, &dados);
         xQueueOverwrite(fila_sensor, &dados);

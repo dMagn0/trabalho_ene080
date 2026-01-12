@@ -46,6 +46,9 @@
 #define SENSOR_GAS 36 //chanel 0
 #define SENSOR_CHAMA 39 //chanel 3
 #define SENSOR_MOVIMENTO 34
+#define VENTILADOR 25  // AZUL
+#define ALERTA_GAS 26  //VERMELHO
+#define ALERTA_CHAMA 27 //  AMARELO
 
 #define RC522_SPI_BUS_GPIO_MISO    (19)
 #define RC522_SPI_BUS_GPIO_MOSI    (23)
